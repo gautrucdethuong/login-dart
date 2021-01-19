@@ -1,6 +1,11 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:login_sigup_flutter/forgotpassscreen.dart';
+import 'package:login_sigup_flutter/homepage.dart';
 import 'package:login_sigup_flutter/signupscreen.dart';
+import 'resetpasscreen.dart';
+
 
 
 class LoginScreen extends StatefulWidget{
@@ -14,6 +19,7 @@ class _LoginScreenState extends State<LoginScreen>{
 
   Widget buildEmail(){
     return Column(
+      // cung cấp hằng số dùng để căng chỉnh
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text('Email', style: TextStyle(
@@ -25,7 +31,7 @@ class _LoginScreenState extends State<LoginScreen>{
         SizedBox(height: 10),
         Container(
           alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
+          decoration: BoxDecoration( // thêm đường viền
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
@@ -39,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen>{
           height: 60,
           child: TextField(
             keyboardType: TextInputType.emailAddress,
+            textInputAction: TextInputAction.continueAction,
             style: TextStyle(
               color: Colors.black87,
             ),
@@ -62,6 +69,7 @@ class _LoginScreenState extends State<LoginScreen>{
   }
   Widget buildPassword(){
     return Column(
+      // cung cấp các hằng số dùng để căng chỉnh
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text('Password', style: TextStyle(
@@ -86,9 +94,8 @@ class _LoginScreenState extends State<LoginScreen>{
           ),
           height: 60,
           child: TextField(
-            obscureText: true,
-            style: TextStyle(
-              color: Colors.black87,
+            obscureText: true, // dung de che khuat cac ki tu van ban
+            style: TextStyle(color: Colors.black87,
             ),
             decoration: InputDecoration(
                 border: InputBorder.none,
@@ -96,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen>{
                 prefixIcon: Icon(
                   Icons.lock, color: Colors.red,
                 ),
-                hintText: 'Password',
+                hintText: 'Password', // style password
                 hintStyle: TextStyle(
                   color: Colors.black,
                 )
@@ -112,7 +119,9 @@ class _LoginScreenState extends State<LoginScreen>{
     return Container(
       alignment: Alignment.centerRight,
       child: FlatButton(
-        onPressed: () => print("Forgot Password pressed"),
+        onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPassword()));
+        },
         padding: EdgeInsets.only(right: 0),
         child: Text(
           'Forgot Password ?',
@@ -201,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen>{
     return Scaffold(
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
-        child: GestureDetector(
+        child: GestureDetector( // thu thap du lieu tren man hinh
           child: Stack(
             children:<Widget> [
               Container(
@@ -222,7 +231,8 @@ class _LoginScreenState extends State<LoginScreen>{
 
                 ),
                 child: SingleChildScrollView(
-                  physics: AlwaysScrollableScrollPhysics(),
+
+                  physics: AlwaysScrollableScrollPhysics(),// tao thanh cuon
                   padding: EdgeInsets.symmetric(
                     horizontal: 25,
                     vertical: 120

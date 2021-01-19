@@ -1,62 +1,13 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 
-
-class  signupscreen extends StatelessWidget {
-
-  Widget buildEmail(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text('Email', style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-        ),
-        SizedBox(height: 10),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 6,
-                    offset: Offset(0,2)
-                )
-              ]
-          ),
-          height: 60,
-          child: TextField(
-            keyboardType: TextInputType.emailAddress,
-            style: TextStyle(
-              color: Colors.black87,
-            ),
-            decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.only(top: 14),
-                prefixIcon: Icon(
-                  Icons.email, color: Colors.red,
-                ),
-                hintText: 'Email',
-                hintStyle: TextStyle(
-                  color: Colors.black,
-                )
-
-            ),
-          ),
-        )
-
-      ],
-    );
-  }
+class ResetPassword extends StatelessWidget {
   Widget buildPassword(){
     return Column(
+      // cung cấp các hằng số dùng để căng chỉnh
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        Text('Password', style: TextStyle(
+        Text('New Password', style: TextStyle(
           color: Colors.white,
           fontSize: 16,
           fontWeight: FontWeight.bold,
@@ -78,9 +29,8 @@ class  signupscreen extends StatelessWidget {
           ),
           height: 60,
           child: TextField(
-            obscureText: true,
-            style: TextStyle(
-              color: Colors.black87,
+            obscureText: true, // dung de che khuat cac ki tu van ban
+            style: TextStyle(color: Colors.black87,
             ),
             decoration: InputDecoration(
                 border: InputBorder.none,
@@ -88,9 +38,9 @@ class  signupscreen extends StatelessWidget {
                 prefixIcon: Icon(
                   Icons.lock, color: Colors.red,
                 ),
-                hintText: 'Password',
+                hintText: 'New Password', // style password
                 hintStyle: TextStyle(
-                  color: Colors.black,
+                  color: Colors.black26,
                 )
 
             ),
@@ -138,7 +88,7 @@ class  signupscreen extends StatelessWidget {
                 ),
                 hintText: 'Confirm Password',
                 hintStyle: TextStyle(
-                  color: Colors.black,
+                  color: Colors.black26,
                 )
 
             ),
@@ -148,70 +98,23 @@ class  signupscreen extends StatelessWidget {
       ],
     );
   }
-  Widget buildFullname(){
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Text('Full Name', style: TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-          fontWeight: FontWeight.bold,
-        ),
-        ),
-        SizedBox(height: 10),
-        Container(
-          alignment: Alignment.centerLeft,
-          decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                    color: Colors.black26,
-                    blurRadius: 6,
-                    offset: Offset(0,2)
-                )
-              ]
-          ),
-          height: 60,
-          child: TextField(
-            keyboardType: TextInputType.name,
-            textCapitalization: TextCapitalization.characters,
-            style: TextStyle(
-              color: Colors.black87,
-            ),
-            decoration: InputDecoration(
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.only(top: 14),
-                prefixIcon: Icon(
-                  Icons.drive_file_rename_outline, color: Colors.red,
-                ),
-                hintText: 'Full Name',
-                hintStyle: TextStyle(
-                  color: Colors.black,
-                )
-
-            ),
-          ),
-        )
-
-      ],
-    );
-  }
-  Widget buildSignUpBtn(){
+  Widget buildResetpassword(){
     return Container(
       padding: EdgeInsets.symmetric(vertical: 25),
       width: double.infinity,
       child: RaisedButton(
         elevation: 5,
-        onPressed: () => print('Sign Up Successful!!!'),
+        onPressed: () {
+          // Navigator.push(context, MaterialPageRoute(builder: (context) => forgotpassword()));
+        },
         padding: EdgeInsets.all(5),
         shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15)
         ),
-        color: Colors.white,
+        color: Colors.pink,
         child: Text(
-          'SIGN UP', style: TextStyle(
-            color: Colors.red,
+          'Reset Password', style: TextStyle(
+            color: Colors.white,
             fontSize: 18,
             fontWeight: FontWeight.bold
         ),
@@ -226,13 +129,14 @@ class  signupscreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Color(0x9900BBEE),
         leading: (
-          new IconButton(icon: Icon(Icons.assignment_return), onPressed: (){
-            Navigator.pop(context); // quay lai man hinh thu nhat bang Navigator.pop
+            new IconButton(icon: Icon(Icons.assignment_return), onPressed: (){
+              Navigator.pop(context); // quay lai man hinh thu nhat bang Navigator.pop
 
-          },)
+            },)
         ),
 
       ),
+
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector(
@@ -260,28 +164,25 @@ class  signupscreen extends StatelessWidget {
                   physics: AlwaysScrollableScrollPhysics(), // tao thanh cuon
                   padding: EdgeInsets.symmetric(
                       horizontal: 25,
-                      vertical: 50
+                      vertical: 80
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: <Widget> [
-                      Text('Register', style: TextStyle(
-                        color: Colors.pink, fontSize: 40, fontWeight: FontWeight.bold,
+                      Text('Reset Password', style: TextStyle(
+                        color: Colors.redAccent, fontSize: 30, fontWeight: FontWeight.bold,
                       ),
                       ),
-                      SizedBox(height: 10),
-                      buildFullname(),
-                      SizedBox(height: 10),
-                      buildEmail(),
-                      SizedBox(height: 10),
+                      SizedBox(height: 30),
+                      Text('Enter your email address below to reset password', style: TextStyle(
+                          color: Colors.black26, fontSize: 15
+                      ),),
+                      SizedBox(height: 30),
                       buildPassword(),
-
                       SizedBox(height: 10),
-                      buildConfirmPass(),
+                     buildConfirmPass(),
                       SizedBox(height: 10),
-                      buildSignUpBtn(),
-
-
+                      buildResetpassword(),
                     ],
                   ),
                 ),
@@ -292,5 +193,6 @@ class  signupscreen extends StatelessWidget {
         ),
       ),
     );
+
   }
 }
