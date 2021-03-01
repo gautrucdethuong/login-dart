@@ -9,7 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 
-import 'package:login_sigup_flutter/main.dart' as app;
+import 'file:///D:/Project%20Fullter/login_sigup_flutter/lib/GUI/main.dart' as app;
 
 void main() => run(_testMain);
 

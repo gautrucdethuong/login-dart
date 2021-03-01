@@ -8,7 +8,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:login_sigup_flutter/main.dart';
+import 'file:///D:/Project%20Fullter/login_sigup_flutter/lib/GUI/main.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {

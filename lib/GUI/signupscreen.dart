@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:login_sigup_flutter/Model/user.dart';
+
 
 
 class  signupscreen extends StatelessWidget {
+  final User user;
+  signupscreen(this.user);
+
 
   Widget buildEmail(){
     return Column(
@@ -42,7 +47,55 @@ class  signupscreen extends StatelessWidget {
                 ),
                 hintText: 'Email',
                 hintStyle: TextStyle(
-                  color: Colors.black,
+                  color: Colors.black26,
+                )
+
+            ),
+          ),
+        )
+
+      ],
+    );
+  }
+  Widget buildUsername(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text('Username', style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+        ),
+        SizedBox(height: 10),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 6,
+                    offset: Offset(0,2)
+                )
+              ]
+          ),
+          height: 60,
+          child: TextField(
+            keyboardType: TextInputType.emailAddress,
+            style: TextStyle(
+              color: Colors.black87,
+            ),
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.only(top: 14),
+                prefixIcon: Icon(
+                  Icons.email, color: Colors.red,
+                ),
+                hintText: 'Username',
+                hintStyle: TextStyle(
+                  color: Colors.black26,
                 )
 
             ),
@@ -90,7 +143,7 @@ class  signupscreen extends StatelessWidget {
                 ),
                 hintText: 'Password',
                 hintStyle: TextStyle(
-                  color: Colors.black,
+                  color: Colors.black26,
                 )
 
             ),
@@ -138,7 +191,7 @@ class  signupscreen extends StatelessWidget {
                 ),
                 hintText: 'Confirm Password',
                 hintStyle: TextStyle(
-                  color: Colors.black,
+                  color: Colors.black26,
                 )
 
             ),
@@ -187,7 +240,7 @@ class  signupscreen extends StatelessWidget {
                 ),
                 hintText: 'Full Name',
                 hintStyle: TextStyle(
-                  color: Colors.black,
+                  color: Colors.black26,
                 )
 
             ),
@@ -217,6 +270,57 @@ class  signupscreen extends StatelessWidget {
         ),
         ),
       ),
+    );
+  }
+  Widget buildPhone(){
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: <Widget>[
+        Text('Number Phone', style: TextStyle(
+          color: Colors.white,
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+        ),
+        ),
+        SizedBox(height: 10),
+        Container(
+          alignment: Alignment.centerLeft,
+          decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black26,
+                    blurRadius: 6,
+                    offset: Offset(0,2)
+                )
+              ]
+          ),
+          height: 60,
+          child: TextField(
+
+            keyboardType: TextInputType.name,
+            maxLength: 12,
+            textCapitalization: TextCapitalization.characters,
+            style: TextStyle(
+              color: Colors.black87,
+            ),
+            decoration: InputDecoration(
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.only(top: 14),
+                prefixIcon: Icon(
+                  Icons.phone_callback, color: Colors.red,
+                ),
+                hintText: 'Number Phone',
+                hintStyle: TextStyle(
+                  color: Colors.black26,
+                )
+
+            ),
+          ),
+        )
+
+      ],
     );
   }
 
@@ -260,7 +364,7 @@ class  signupscreen extends StatelessWidget {
                   physics: AlwaysScrollableScrollPhysics(), // tao thanh cuon
                   padding: EdgeInsets.symmetric(
                       horizontal: 25,
-                      vertical: 50
+                      vertical: 10
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -274,12 +378,17 @@ class  signupscreen extends StatelessWidget {
                       SizedBox(height: 10),
                       buildEmail(),
                       SizedBox(height: 10),
+                      buildUsername(),
+                      SizedBox(height: 10),
+                      buildPhone(),
+                      SizedBox(height: 10),
                       buildPassword(),
-
                       SizedBox(height: 10),
                       buildConfirmPass(),
                       SizedBox(height: 10),
                       buildSignUpBtn(),
+
+
 
 
                     ],

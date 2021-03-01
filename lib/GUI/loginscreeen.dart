@@ -1,9 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:login_sigup_flutter/forgotpassscreen.dart';
-import 'package:login_sigup_flutter/homepage.dart';
-import 'package:login_sigup_flutter/signupscreen.dart';
+import 'package:login_sigup_flutter/GUI/signup.dart';
 import 'resetpasscreen.dart';
 
 
@@ -11,15 +9,23 @@ import 'resetpasscreen.dart';
 class LoginScreen extends StatefulWidget{
   @override
   _LoginScreenState createState()=> _LoginScreenState();
-
   }
 
 class _LoginScreenState extends State<LoginScreen>{
+  final formKey = GlobalKey<FormState>();
+  final TextEditingController emailController = new TextEditingController();
+  final TextEditingController passwordController = new TextEditingController();
   bool isRememberMe = false;
+
+  @override
+  void dispose(){
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
 
   Widget buildEmail(){
     return Column(
-      // cung cấp hằng số dùng để căng chỉnh
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text('Email', style: TextStyle(
@@ -31,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen>{
         SizedBox(height: 10),
         Container(
           alignment: Alignment.centerLeft,
-          decoration: BoxDecoration( // thêm đường viền
+          decoration: BoxDecoration(
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
@@ -43,21 +49,27 @@ class _LoginScreenState extends State<LoginScreen>{
               ]
           ),
           height: 60,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.continueAction,
             style: TextStyle(
               color: Colors.black87,
             ),
+            controller: emailController,
+            validator: (value) {
+              if(value.isEmpty){
+                return 'Email or Password cannot be empty';
+              }
+              return null;
+            },
             decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(top: 14),
                 prefixIcon: Icon(
                   Icons.email, color: Colors.red,
                 ),
-                hintText: 'Email',
+                hintText: 'Email or username',
                 hintStyle: TextStyle(
-                  color: Colors.black,
+                  color: Colors.black26,
                 )
 
             ),
@@ -93,10 +105,17 @@ class _LoginScreenState extends State<LoginScreen>{
               ]
           ),
           height: 60,
-          child: TextField(
+          child: TextFormField(
             obscureText: true, // dung de che khuat cac ki tu van ban
             style: TextStyle(color: Colors.black87,
             ),
+            controller: passwordController,
+            validator: (value){
+              if(value.isEmpty){
+                return 'Password cannot be empty';
+              }
+              return null;
+            },
             decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(top: 14),
@@ -105,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen>{
                 ),
                 hintText: 'Password', // style password
                 hintStyle: TextStyle(
-                  color: Colors.black,
+                  color: Colors.black26,
                 )
 
             ),
@@ -198,12 +217,18 @@ class _LoginScreenState extends State<LoginScreen>{
               ),
               ),
           onPressed: (){
-            Navigator.push(context, MaterialPageRoute(builder: (context) => signupscreen()), // chuyen new page
-            );
+            /*Navigator.push(context, Materi
+            alPageRoute(builder: (context) => signup(user)), // chuyen new page
+            );*/
       },
     ),
     );
   }
+
+  /*void navigateToUser(User user) async{
+    await Navigator.push(context, MaterialPageRoute(builder: (context) => signup(user)));
+  }*/
+
 
   @override
   Widget build(BuildContext context) {
@@ -265,4 +290,5 @@ class _LoginScreenState extends State<LoginScreen>{
       ),
     );
   }
+
 }
