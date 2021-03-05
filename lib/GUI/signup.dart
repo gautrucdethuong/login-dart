@@ -1,25 +1,30 @@
+import 'dart:async';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:login_sigup_flutter/GUI/loginscreeen.dart';
 import 'package:login_sigup_flutter/Helper/api.services.dart';
 import 'package:login_sigup_flutter/Model/user.dart';
+import 'package:http/http.dart' as http;
+
 
 class signup extends StatefulWidget {
-  final User user;
-  signup(this.user);
 
   @override
-  _signupState createState() => _signupState(user);
+  _signupState createState() => _signupState();
 }
 
 class _signupState extends State<signup> {
-  User user;
-  _signupState(this.user);
+  Future<User> futureUsers;
 
-  var fullnameController = TextEditingController();
-  var emailController = TextEditingController();
-  var usernameController = TextEditingController();
-  var phoneController = TextEditingController();
-  var passwordController = TextEditingController();
+  final GlobalKey<FormState> form = GlobalKey<FormState>();
+  final fullNameController = TextEditingController();
+  final emailController = TextEditingController();
+  final usernameController = TextEditingController();
+  final phoneController = TextEditingController();
+  final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
+
 
   Widget buildEmail(){
     return Column(
@@ -46,10 +51,15 @@ class _signupState extends State<signup> {
               ]
           ),
           height: 60,
-          child: TextField(
-            //keyboardType: TextInputType.emailAddress,
+          child: TextFormField(
+            keyboardType: TextInputType.emailAddress,
             controller: emailController,
-            onChanged:(value) => updateEmail(),
+            validator: (String value){
+              if(value.isEmpty){
+                return "Please enter email.";
+              }
+                return null;
+            },
             style: TextStyle(
               color: Colors.black87,
             ),
@@ -63,7 +73,6 @@ class _signupState extends State<signup> {
                 hintStyle: TextStyle(
                   color: Colors.black26,
                 )
-
             ),
           ),
         )
@@ -96,9 +105,15 @@ class _signupState extends State<signup> {
               ]
           ),
           height: 60,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.emailAddress,
-            onChanged: (value) => updateUsername(),
+            controller: usernameController,
+            validator: (value){
+              if(value.isEmpty){
+                return "Username can't be empty.";
+              }
+              return null;
+            },
             style: TextStyle(
               color: Colors.black87,
             ),
@@ -145,9 +160,16 @@ class _signupState extends State<signup> {
               ]
           ),
           height: 60,
-          child: TextField(
+          child: TextFormField(
             obscureText: true,
-            onChanged: (value) => updatePassword(),
+            controller: passwordController,
+            validator: (value){
+              if(value.isEmpty){
+                return "Password can't be empty.";
+              }
+             // if(validatePassword(passwordController.text.trim()))
+                return null;
+            },
             style: TextStyle(
               color: Colors.black87,
             ),
@@ -194,8 +216,15 @@ class _signupState extends State<signup> {
               ]
           ),
           height: 60,
-          child: TextField(
+          child: TextFormField(
             obscureText: true,
+            controller: confirmPasswordController,
+            validator: (value){
+              if(value.isEmpty){
+                return "Confirm password can't empty.";
+              }
+              return null;
+            },
             style: TextStyle(
               color: Colors.black87,
             ),
@@ -209,11 +238,9 @@ class _signupState extends State<signup> {
                 hintStyle: TextStyle(
                   color: Colors.black26,
                 )
-
             ),
           ),
         )
-
       ],
     );
   }
@@ -242,9 +269,15 @@ class _signupState extends State<signup> {
               ]
           ),
           height: 60,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.name,
-            onChanged:(value) => updateFullname(),
+            controller: fullNameController,
+            validator: (value){
+              if(value.isEmpty){
+                return "Fullname can't be empty.";
+              }
+              return null;
+            },
             textCapitalization: TextCapitalization.characters,
             style: TextStyle(
               color: Colors.black87,
@@ -259,36 +292,10 @@ class _signupState extends State<signup> {
                 hintStyle: TextStyle(
                   color: Colors.black26,
                 )
-
             ),
           ),
         )
-
       ],
-    );
-  }
-  Widget buildSignUpBtn(){
-    return Container(
-      padding: EdgeInsets.symmetric(vertical: 25),
-      width: double.infinity,
-      child: RaisedButton(
-        elevation: 5,
-        onPressed: (){
-          btnRegister();
-        },
-        padding: EdgeInsets.all(5),
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15)
-        ),
-        color: Colors.white,
-        child: Text(
-          'SIGN UP', style: TextStyle(
-            color: Colors.red,
-            fontSize: 18,
-            fontWeight: FontWeight.bold
-        ),
-        ),
-      ),
     );
   }
   Widget buildPhone(){
@@ -316,9 +323,16 @@ class _signupState extends State<signup> {
               ]
           ),
           height: 60,
-          child: TextField(
+          child: TextFormField(
             keyboardType: TextInputType.name,
-            onChanged: (value) => updatePhone(),
+            controller: phoneController,
+            validator: (value){
+              if(value.isEmpty){
+                return "Phone number can't be empty.";
+              }
+              //if(validatePhone(phoneController.text.trim()))
+                return null;
+            },
             maxLength: 12,
             textCapitalization: TextCapitalization.characters,
             style: TextStyle(
@@ -342,46 +356,52 @@ class _signupState extends State<signup> {
       ],
     );
   }
-  void btnRegister() async{
-    //var saveRepose = await APIService.PostUser(user);
-   // saveRepose == true ? Navigator.pop(context,true) : null;
-  }
-
-  void updateFullname(){
-    //user.fullname = fullnameController.text;
-  }
-  void updateUsername(){
-    user.username = usernameController.text;
-  }
-  void updateEmail(){
-    user.email = emailController.text;
-  }
-  void updatePhone(){
-    //user.numberphone = phoneController.text;
-  }
-  void updatePassword(){
-    //user.password = passwordController.text;
+  Widget buildSignUpBtn(){
+    return Container(
+      padding: EdgeInsets.symmetric(vertical: 25),
+      width: double.infinity,
+      child: (futureUsers == null) ?
+      RaisedButton(
+        elevation: 5,
+        onPressed: () async{
+          setState(() {
+            Register();
+          });
+        },
+        padding: EdgeInsets.all(5),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15)
+        ),
+        color: Colors.white,
+        child: Text(
+          'SIGN UP', style: TextStyle(
+            color: Colors.red,
+            fontSize: 18,
+            fontWeight: FontWeight.bold
+        ),
+        ),
+      ) : FutureBuilder<User>(
+          future: futureUsers,
+          builder: (context, snapshot){
+            if(snapshot.hasData){
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => LoginScreen()),);
+            }else if(snapshot.hasError){
+              return Center(child: CircularProgressIndicator(),);
+            }
+            return Center(child: CircularProgressIndicator(),);
+          })
+    );
   }
 
   @override
   Widget build(BuildContext context) {
 
-    //fullnameController.text = user.fullname;
-    emailController.text = user.email;
-    usernameController.text = user.username;
-    //phoneController.text = user.numberphone;
-    passwordController.text = user.password;
-
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0x9900BBEE),
-        leading: (
-            new IconButton(icon: Icon(Icons.assignment_return), onPressed: (){
-              Navigator.pop(context); // quay lai man hinh thu nhat bang Navigator.pop
-
-            },)
-        ),
-
+        backgroundColor: Colors.lightBlueAccent,
+        //leadingWidth: 10,
+        toolbarHeight: 40,
       ),
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
@@ -403,7 +423,6 @@ class _signupState extends State<signup> {
                           Color(0xff00BBEE),
                         ]
                     )
-
                 ),
                 child: SingleChildScrollView(
 
@@ -433,19 +452,65 @@ class _signupState extends State<signup> {
                       buildConfirmPass(),
                       SizedBox(height: 10),
                       buildSignUpBtn(),
-
-
-
-
                     ],
                   ),
                 ),
               )
-
             ],
           ),
         ),
       ),
     );
   }
+
+   Register(){
+    if(fullNameController.text.trim().isNotEmpty && emailController.text.trim().isNotEmpty && 
+        usernameController.text.trim().isNotEmpty && phoneController.text.trim().isNotEmpty && 
+        passwordController.text.trim().isNotEmpty && confirmPasswordController.text.trim().isNotEmpty &&
+        (passwordController.text.trim() == confirmPasswordController.text.trim())){
+      futureUsers = APIService.CreateUser(usernameController.text,passwordController.text,fullNameController.text,emailController.text,phoneController.text);
+    }else{
+      displayDialog(context, "Fields cannot be left blank", "Password confirmation must match", "Try again");
+    }
+  }
+
+  displayDialog(BuildContext context, String title, String text, String confirm) {
+    showDialog(
+      context: context,
+      builder: (context) =>
+          CupertinoAlertDialog(
+            title: Text(title),
+            content: Text(text),
+            actions: <Widget>[
+              FlatButton(onPressed: (){
+                Navigator.of(context).pop();
+              },
+                  child: CupertinoDialogAction(child: Text(confirm)))
+            ],
+          ),
+    );
+  }
+
+  // valid data
+  bool validateEmail(String email) {
+    Pattern pattern = r'^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$';
+
+    RegExp regex = new RegExp(pattern);
+    return (!regex.hasMatch(email)) ? false : true;
+  }
+
+  bool validatePassword(String password) {
+    Pattern pattern = r'^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$';
+
+    RegExp regex = new RegExp(pattern);
+    return (!regex.hasMatch(password)) ? false : true;
+  }
+
+  bool validatePhone(String phone) {
+    Pattern pattern = r'^\\d{10}$|^\\d{11}$';
+
+    RegExp regex = new RegExp(pattern);
+    return (!regex.hasMatch(phone)) ? false : true;
+  }
+
 }

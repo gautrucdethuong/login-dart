@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:login_sigup_flutter/Animation/LoadingError.dart';
+import 'package:login_sigup_flutter/GUI/signup.dart';
 import 'homepage.dart';
 import 'loginscreeen.dart';
 

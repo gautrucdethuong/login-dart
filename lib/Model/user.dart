@@ -1,19 +1,24 @@
-
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+
 
 class User{
   //declare variable
-  int id;
-  String fullName;
-  String email;
-  String username;
-  String phoneNumber;
-  String password;
+  final int id;
+  final String fullName;
+  final String email;
+  final String username;
+  final String phoneNumber;
+  final String password;
   String role;
-  String token;
+  final String token;
 
   //constructor
-  User({this.id, this.fullName, this.email,  this.username, this.phoneNumber, this.password});
+  User({@required this.id,@required this.fullName,@required this.email,@required this.username,@required this.phoneNumber,@required this.password, this.token});
+
+  //get data
+  @override
+  int get hashCode => hashValues(id, fullName, email, username, phoneNumber, password, token);
 
 
   factory User.fromJson(Map<String, dynamic> json) {

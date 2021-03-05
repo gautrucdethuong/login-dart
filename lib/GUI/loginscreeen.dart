@@ -1,9 +1,14 @@
+import 'dart:convert';
+import 'dart:convert' as convert;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:login_sigup_flutter/GUI/signup.dart';
+import 'package:login_sigup_flutter/Helper/api.services.dart';
+import 'package:login_sigup_flutter/Model/user.dart';
+import 'homepage.dart';
 import 'resetpasscreen.dart';
-
+import 'package:http/http.dart' as http;
 
 
 class LoginScreen extends StatefulWidget{
@@ -12,23 +17,19 @@ class LoginScreen extends StatefulWidget{
   }
 
 class _LoginScreenState extends State<LoginScreen>{
-  final formKey = GlobalKey<FormState>();
-  final TextEditingController emailController = new TextEditingController();
-  final TextEditingController passwordController = new TextEditingController();
-  bool isRememberMe = false;
 
-  @override
-  void dispose(){
-    emailController.dispose();
-    passwordController.dispose();
-    super.dispose();
-  }
+  bool visible = false ;
+  bool isRememberMe = true;
+  final  usernameController = new TextEditingController();
+  final  passwordController = new TextEditingController();
 
-  Widget buildEmail(){
+  // widget
+  Widget buildUsername(){
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
+
       children: <Widget>[
-        Text('Email', style: TextStyle(
+        Text('Username', style: TextStyle(
           color: Colors.white,
           fontSize: 16,
           fontWeight: FontWeight.bold,
@@ -49,25 +50,19 @@ class _LoginScreenState extends State<LoginScreen>{
               ]
           ),
           height: 60,
-          child: TextFormField(
+          child: new TextFormField(
             keyboardType: TextInputType.emailAddress,
+            controller: usernameController,
             style: TextStyle(
               color: Colors.black87,
             ),
-            controller: emailController,
-            validator: (value) {
-              if(value.isEmpty){
-                return 'Email or Password cannot be empty';
-              }
-              return null;
-            },
             decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(top: 14),
                 prefixIcon: Icon(
                   Icons.email, color: Colors.red,
                 ),
-                hintText: 'Email or username',
+                hintText: 'Username',
                 hintStyle: TextStyle(
                   color: Colors.black26,
                 )
@@ -75,7 +70,6 @@ class _LoginScreenState extends State<LoginScreen>{
             ),
           ),
         )
-
       ],
     );
   }
@@ -110,12 +104,6 @@ class _LoginScreenState extends State<LoginScreen>{
             style: TextStyle(color: Colors.black87,
             ),
             controller: passwordController,
-            validator: (value){
-              if(value.isEmpty){
-                return 'Password cannot be empty';
-              }
-              return null;
-            },
             decoration: InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(top: 14),
@@ -171,68 +159,140 @@ class _LoginScreenState extends State<LoginScreen>{
             ),
           ),
           Text('Remember me',
-          style: TextStyle(
-             color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
+            style: TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
+            ),
           )
         ],
       ),
-
     );
   }
   Widget buildLoginBtn(){
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 25),
-      width: double.infinity,
-      child: RaisedButton(
-        elevation: 5,
-        onPressed: () => print('Login Pressed'),
-        padding: EdgeInsets.all(5),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15)
-        ),
-        color: Colors.white,
-        child: Text(
-          'LOGIN', style: TextStyle(
-          color: Colors.red,
-          fontSize: 18,
-          fontWeight: FontWeight.bold
-        ),
-        ),
-      ),
+        padding: EdgeInsets.symmetric(vertical: 25),
+        width: double.infinity,
+        child:
+        RaisedButton(
+          elevation: 5,
+          onPressed: () async{
+            setState(() {
+              if(usernameController.text.trim().isNotEmpty && passwordController.text.trim().isNotEmpty){
+                Login(usernameController.text,passwordController.text);
+              }else{
+                displayDialog(context, "Username and password required.", "","Cancel");
+              }
+            });
+          },
+          padding: EdgeInsets.all(5),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15)
+          ),
+          color: Colors.white,
+          child: Text(
+            'LOGIN', style: TextStyle(
+              color: Colors.red,
+              fontSize: 18,
+              fontWeight: FontWeight.bold
+          ),
+          ),
+        )
     );
   }
   Widget buildSignupBtn(){
     return GestureDetector(
-      onTap: (
-          ) => print("Sign up Pressed"),
-
-        child: RaisedButton(
-            child: Text('Sign Up',
-            style: TextStyle(
-              color: Colors.red,
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              ),
-              ),
-          onPressed: (){
-            /*Navigator.push(context, Materi
-            alPageRoute(builder: (context) => signup(user)), // chuyen new page
-            );*/
-      },
-    ),
+      child: RaisedButton(
+        child: Text('Sign Up',
+          style: TextStyle(
+            color: Colors.red,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        onPressed: (){
+          Navigator.push(context,
+            MaterialPageRoute(builder: (context) => signup()), // chuyen new page
+          );
+        },
+      ),
     );
   }
 
-  /*void navigateToUser(User user) async{
-    await Navigator.push(context, MaterialPageRoute(builder: (context) => signup(user)));
-  }*/
+    //login
+   Future<User> Login(String username, String password) async {
+
+    setState(() {
+      visible = true ;
+    });
+
+    String body = convert.jsonEncode(<String, String>{
+      'username': username,
+      'password': password,
+    });
+
+    final response = await http.Client().post('http://10.0.2.2:5000/api/Token/login',
+      headers: <String, String>{
+        'Content-Type': 'application/json',
+      },
+      body: body,
+    );
+
+    final repoData = json.decode(response.body);
+    final parsed = repoData['result'];
+
+    if(response.statusCode == 200){
+      // check status login
+      if(parsed == "Successed."){
+        String token = repoData['data']['token'];
+
+        APIService.setToken(token);
+        setState(() {
+          visible = false;
+        });
+
+
+
+        Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage())
+        );
+      }else{
+
+        setState(() {
+          visible = false;
+        });
+            displayDialog(context, "No account was found matching that username and password.", "", "Try again");
+      }
+    }else{
+      throw Exception('Failed to load Data');
+    }
+  }
+
+
+
+    // show status message
+   displayDialog(BuildContext context, String title, String text, String confirm) {
+     showDialog(
+       context: context,
+       builder: (context) =>
+           CupertinoAlertDialog(
+             title: Text(title),
+             content: Text(text),
+             actions: <Widget>[
+               FlatButton(onPressed: (){
+                 Navigator.of(context).pop();
+               },
+                   child: CupertinoDialogAction(child: Text(confirm)))
+             ],
+           ),
+     );
+   }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector( // thu thap du lieu tren man hinh
@@ -253,7 +313,6 @@ class _LoginScreenState extends State<LoginScreen>{
                       Color(0xff00BBEE),
                     ]
                   )
-
                 ),
                 child: SingleChildScrollView(
 
@@ -270,25 +329,22 @@ class _LoginScreenState extends State<LoginScreen>{
                       ),
                       ),
                       SizedBox(height: 50),
-                      buildEmail(),
+                      buildUsername(),
                       SizedBox(height: 20),
                       buildPassword(),
                       //buildRememberCbb(),
                       buildForgetPassBtn(),
                       buildLoginBtn(),
                       buildSignupBtn(),
-
-
                     ],
                   ),
                 ),
               )
-
             ],
           ),
         ),
       ),
     );
   }
-
 }
+

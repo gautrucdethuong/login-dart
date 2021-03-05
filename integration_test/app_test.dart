@@ -13,6 +13,9 @@ import 'file:///D:/Project%20Fullter/login_sigup_flutter/lib/GUI/main.dart' as a
 
 void main() => run(_testMain);
 
+run(void Function() testMain) {
+}
+
 void _testMain() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.

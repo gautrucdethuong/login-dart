@@ -1,48 +1,67 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:flutter/foundation.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:login_sigup_flutter/Animation/LoadingError.dart';
+import 'package:login_sigup_flutter/GUI/loginscreeen.dart';
+import 'package:login_sigup_flutter/GUI/userdetails.dart';
 import 'package:login_sigup_flutter/Helper/api.services.dart';
 import 'package:login_sigup_flutter/Model/user.dart';
-import 'package:http/http.dart' as http;
-import 'dart:async';
 
 
 
-class MyApp2 extends StatefulWidget {
+class HomePage extends StatefulWidget {
   @override
   _MyApp2State createState() => _MyApp2State();
 }
 
 
-class _MyApp2State extends State<MyApp2> {
+class _MyApp2State extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("LIST USER"), centerTitle: true, backgroundColor: Colors.blue,),
+      appBar: AppBar(title: Text("LIST USER"), centerTitle: true, backgroundColor: Colors.purple,
+      actions: <Widget>[
+        IconButton(icon: Icon(Icons.logout), onPressed: () async{
+          //RestarApp.restartApp(context);
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => LoginScreen()));
+        }
+        ),
+      ],
+      ),
       body: Container(
-        child: FutureBuilder<List<User>>(
+        child: FutureBuilder(
           future: APIService.fetchUser(),
-          builder: (context, snapshot){
-            if(snapshot.data == null){
-              return Container(child: Center(child: Text("Loading...."),),);
-            }else{
-              return ListView.builder(
-                itemCount: snapshot.data.length,
-                itemBuilder: (BuildContext context, int index){
-                    return ListTile(
-                      subtitle: Text(snapshot.data[index].phoneNumber),
-                      title: Text(snapshot.data[index].fullName),
-
-                    );
-                },
+          builder: (BuildContext context, AsyncSnapshot<List<User>> snapshot){
+            if (snapshot.hasData) {
+              List<User> posts = snapshot.data;
+              return ListView(
+                children: posts
+                    .map(
+                      (User post) => ListTile(
+                    title: Text(post.fullName),
+                    subtitle: Text("${post.email}"),
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) => UserDetail(
+                          user: post,
+                        ),
+                      ),
+                    ),
+                  ),
+                )
+                    .toList(),
               );
+            } else {
+              //return Center(child: CircularProgressIndicator());
+              return ShimmerList();
             }
           },
         ),
       ),
     );
   }
+
 }
 
 
