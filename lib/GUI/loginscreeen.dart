@@ -3,6 +3,7 @@ import 'dart:convert' as convert;
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:login_sigup_flutter/GUI/filterPage.dart';
 import 'package:login_sigup_flutter/GUI/signup.dart';
 import 'package:login_sigup_flutter/Helper/api.services.dart';
 import 'package:login_sigup_flutter/Model/user.dart';
@@ -246,13 +247,13 @@ class _LoginScreenState extends State<LoginScreen>{
         String token = repoData['data']['token'];
 
         APIService.setToken(token);
+        //APIService.read(parsed);
+
         setState(() {
           visible = false;
         });
 
-
-
-        Navigator.push(
+        Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => HomePage())
         );
@@ -267,7 +268,6 @@ class _LoginScreenState extends State<LoginScreen>{
       throw Exception('Failed to load Data');
     }
   }
-
 
 
     // show status message
@@ -288,11 +288,9 @@ class _LoginScreenState extends State<LoginScreen>{
      );
    }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
         child: GestureDetector( // thu thap du lieu tren man hinh

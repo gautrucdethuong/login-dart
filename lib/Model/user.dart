@@ -32,7 +32,7 @@ class User{
     );
   }
 
-  // api get data list
+  // parse User data
   static List<User> parseUsers(String responseBody) {
     var repoData = jsonDecode(responseBody);
     final parsed = repoData['data'].cast<Map<String, dynamic>>();

@@ -82,15 +82,9 @@ class forgotpassword extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Color(0x9900BBEE),
-        leading: (
-            new IconButton(icon: Icon(Icons.assignment_return), onPressed: (){
-              Navigator.pop(context); // quay lai man hinh thu nhat bang Navigator.pop
-
-            },)
-        ),
-
+        backgroundColor: Colors.deepOrange[400],
       ),
+
 
       body: AnnotatedRegion<SystemUiOverlayStyle>(
         value: SystemUiOverlayStyle.light,
@@ -140,7 +134,6 @@ class forgotpassword extends StatelessWidget {
                   ),
                 ),
               )
-
             ],
           ),
         ),

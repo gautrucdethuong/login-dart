@@ -33,6 +33,7 @@ class ShimmerList extends StatelessWidget {
   }
 }
 
+
 class ShimmerLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -97,6 +98,7 @@ class ShimmerImage extends StatelessWidget {
   }
 }
 
+
 class WallpaperImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -115,6 +117,7 @@ class WallpaperImage extends StatelessWidget {
     );
   }
 
+
   Widget shimmerText() {
     return Shimmer.fromColors(
       baseColor: Colors.grey[500],
@@ -122,6 +125,7 @@ class WallpaperImage extends StatelessWidget {
       child: Text(
         "> Slide to unlock",
         style: TextStyle(fontSize: 25),
+
       ),
     );
   }

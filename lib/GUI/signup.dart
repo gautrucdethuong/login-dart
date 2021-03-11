@@ -15,9 +15,12 @@ class signup extends StatefulWidget {
 }
 
 class _signupState extends State<signup> {
+
   Future<User> futureUsers;
 
-  final GlobalKey<FormState> form = GlobalKey<FormState>();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   final fullNameController = TextEditingController();
   final emailController = TextEditingController();
   final usernameController = TextEditingController();
@@ -52,18 +55,24 @@ class _signupState extends State<signup> {
           ),
           height: 60,
           child: TextFormField(
+            maxLength: 32,
             keyboardType: TextInputType.emailAddress,
             controller: emailController,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (String value){
               if(value.isEmpty){
                 return "Please enter email.";
               }
+              if(!RegExp("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}").hasMatch(value)){
+                return 'Enter a valid email address';
+              }
                 return null;
             },
+
             style: TextStyle(
               color: Colors.black87,
             ),
-            decoration: InputDecoration(
+            decoration: const InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.only(top: 14),
                 prefixIcon: Icon(
@@ -94,6 +103,7 @@ class _signupState extends State<signup> {
         Container(
           alignment: Alignment.centerLeft,
           decoration: BoxDecoration(
+
               color: Colors.white,
               borderRadius: BorderRadius.circular(10),
               boxShadow: [
@@ -108,9 +118,13 @@ class _signupState extends State<signup> {
           child: TextFormField(
             keyboardType: TextInputType.emailAddress,
             controller: usernameController,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            maxLength: 15,
             validator: (value){
               if(value.isEmpty){
                 return "Username can't be empty.";
+              }else if(!RegExp("^[a-z0-9_-]{3,16}").hasMatch(value)){
+                return "Username at least 3 characters.";
               }
               return null;
             },
@@ -163,11 +177,14 @@ class _signupState extends State<signup> {
           child: TextFormField(
             obscureText: true,
             controller: passwordController,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            maxLength: 50,
             validator: (value){
               if(value.isEmpty){
                 return "Password can't be empty.";
+              }else if(!RegExp("^.*(?=.{8,})(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[!*@#%^&+=]).*").hasMatch(value)){
+                return "Password very bad, at least 8 characters.";
               }
-             // if(validatePassword(passwordController.text.trim()))
                 return null;
             },
             style: TextStyle(
@@ -219,9 +236,13 @@ class _signupState extends State<signup> {
           child: TextFormField(
             obscureText: true,
             controller: confirmPasswordController,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            maxLength: 50,
             validator: (value){
               if(value.isEmpty){
                 return "Confirm password can't empty.";
+              }else if(value != passwordController.text){
+                return "Password confirmation must match";
               }
               return null;
             },
@@ -272,10 +293,14 @@ class _signupState extends State<signup> {
           child: TextFormField(
             keyboardType: TextInputType.name,
             controller: fullNameController,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value){
               if(value.isEmpty){
-                return "Fullname can't be empty.";
+                return "Full name can't be empty.";
+              }else if(!RegExp("^[a-z A-Z]+").hasMatch(value)){
+                return "Full name at least 2 words.";
               }
+
               return null;
             },
             textCapitalization: TextCapitalization.characters,
@@ -326,11 +351,14 @@ class _signupState extends State<signup> {
           child: TextFormField(
             keyboardType: TextInputType.name,
             controller: phoneController,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             validator: (value){
               if(value.isEmpty){
                 return "Phone number can't be empty.";
               }
-              //if(validatePhone(phoneController.text.trim()))
+              if(!RegExp("^\\d{10}|^\\d{11}").hasMatch(value)){
+                return 'Enter a valid phone number';
+              }
                 return null;
             },
             maxLength: 12,
@@ -358,15 +386,17 @@ class _signupState extends State<signup> {
   }
   Widget buildSignUpBtn(){
     return Container(
+      key: _scaffoldKey,
       padding: EdgeInsets.symmetric(vertical: 25),
       width: double.infinity,
       child: (futureUsers == null) ?
       RaisedButton(
         elevation: 5,
         onPressed: () async{
-          setState(() {
-            Register();
-          });
+            setState(() {
+          futureUsers = APIService.createUser(usernameController.text,passwordController.text,fullNameController.text,emailController.text,phoneController.text);
+          //_scaffoldKey.currentState.showSnackBar(snackBar);
+            });
         },
         padding: EdgeInsets.all(5),
         shape: RoundedRectangleBorder(
@@ -384,8 +414,9 @@ class _signupState extends State<signup> {
           future: futureUsers,
           builder: (context, snapshot){
             if(snapshot.hasData){
-              Navigator.push(context,
-                  MaterialPageRoute(builder: (context) => LoginScreen()),);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => LoginScreen()));
+              });
             }else if(snapshot.hasError){
               return Center(child: CircularProgressIndicator(),);
             }
@@ -393,6 +424,12 @@ class _signupState extends State<signup> {
           })
     );
   }
+
+  final snackBar = SnackBar(content: Text("Register Successed.", style: TextStyle(
+    fontSize: 16,),),
+    duration: Duration(seconds: 2),
+    backgroundColor: Colors.green,
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -462,55 +499,4 @@ class _signupState extends State<signup> {
       ),
     );
   }
-
-   Register(){
-    if(fullNameController.text.trim().isNotEmpty && emailController.text.trim().isNotEmpty && 
-        usernameController.text.trim().isNotEmpty && phoneController.text.trim().isNotEmpty && 
-        passwordController.text.trim().isNotEmpty && confirmPasswordController.text.trim().isNotEmpty &&
-        (passwordController.text.trim() == confirmPasswordController.text.trim())){
-      futureUsers = APIService.CreateUser(usernameController.text,passwordController.text,fullNameController.text,emailController.text,phoneController.text);
-    }else{
-      displayDialog(context, "Fields cannot be left blank", "Password confirmation must match", "Try again");
-    }
-  }
-
-  displayDialog(BuildContext context, String title, String text, String confirm) {
-    showDialog(
-      context: context,
-      builder: (context) =>
-          CupertinoAlertDialog(
-            title: Text(title),
-            content: Text(text),
-            actions: <Widget>[
-              FlatButton(onPressed: (){
-                Navigator.of(context).pop();
-              },
-                  child: CupertinoDialogAction(child: Text(confirm)))
-            ],
-          ),
-    );
-  }
-
-  // valid data
-  bool validateEmail(String email) {
-    Pattern pattern = r'^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$';
-
-    RegExp regex = new RegExp(pattern);
-    return (!regex.hasMatch(email)) ? false : true;
-  }
-
-  bool validatePassword(String password) {
-    Pattern pattern = r'^(?=.*\\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$';
-
-    RegExp regex = new RegExp(pattern);
-    return (!regex.hasMatch(password)) ? false : true;
-  }
-
-  bool validatePhone(String phone) {
-    Pattern pattern = r'^\\d{10}$|^\\d{11}$';
-
-    RegExp regex = new RegExp(pattern);
-    return (!regex.hasMatch(phone)) ? false : true;
-  }
-
 }

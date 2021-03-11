@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:login_sigup_flutter/Animation/LoadingError.dart';
+import 'package:login_sigup_flutter/GUI/maindrawer.dart';
 import 'package:login_sigup_flutter/GUI/signup.dart';
+import 'package:login_sigup_flutter/GUI/updateprofile.dart';
 import 'homepage.dart';
 import 'loginscreeen.dart';
 
@@ -11,7 +13,6 @@ Future<void> main() {
   HttpOverrides.global = new MyHttpOverrides();
   runApp(MyApp());
 }
-
 
 class MyHttpOverrides extends HttpOverrides{
   @override
@@ -22,7 +23,6 @@ class MyHttpOverrides extends HttpOverrides{
 }
 
 class MyApp extends StatelessWidget {
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -30,6 +30,10 @@ class MyApp extends StatelessWidget {
       title: 'Flutter Demo',
       //xóa nhãn debug trên màn hình ứng dụng,
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.red,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       home: LoginScreen(),
     );
   }

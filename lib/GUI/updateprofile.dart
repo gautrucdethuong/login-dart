@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:login_sigup_flutter/Helper/api.services.dart';
 import 'package:login_sigup_flutter/Model/user.dart';
 
-class UserDetail extends StatelessWidget {
+class UpdateProfile extends StatelessWidget {
 
   final User user;
 
-  UserDetail({@required this.user});
+  UpdateProfile({@required this.user});
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final userNameController = TextEditingController();
@@ -34,7 +34,7 @@ class UserDetail extends StatelessWidget {
         },
         decoration: InputDecoration(
             enabledBorder: InputBorder.none,
-            hintText: user.fullName,
+         //   hintText: user.fullName,
             icon: Icon(Icons.drive_file_rename_outline)
         ),
       ),
@@ -60,7 +60,7 @@ class UserDetail extends StatelessWidget {
         },
         decoration: InputDecoration(
             enabledBorder: InputBorder.none,
-            hintText: user.email,
+          //  hintText: user.email,
             icon: Icon(Icons.email)
         ),
       ),
@@ -85,7 +85,7 @@ class UserDetail extends StatelessWidget {
           return null;
         },
         decoration: InputDecoration(
-            hintText: user.phoneNumber,
+           // hintText: user.phoneNumber,
             enabledBorder: InputBorder.none,
             icon: Icon(Icons.phone)
         ),
@@ -113,7 +113,31 @@ class UserDetail extends StatelessWidget {
         decoration: InputDecoration(
           icon: Icon(Icons.lock_clock),
           enabledBorder: InputBorder.none,
-          hintText: user.password,
+          //hintText: user.password,
+        ),
+      ),
+    );
+  }
+  Widget buildAvatar(){
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(10),
+      color: Colors.redAccent[200],
+      child: Center(
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: 100,
+              height: 100,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(
+                  image: NetworkImage("https://i.pinimg.com/originals/3d/1a/da/3d1ada2607633fd746c7f03f2c7a7bab.jpg"),
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -122,16 +146,18 @@ class UserDetail extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
+        key: _scaffoldKey,
         appBar: AppBar(
-          title: Text("Welcome " + user.username),
-          backgroundColor: Colors.redAccent,
+          title: Text("My Profile"),
+          centerTitle: true,
+          backgroundColor: Colors.redAccent[200],
         ),
         body: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(12.0),
             child: Column(
               children: <Widget>[
+                buildAvatar(),
                 Card(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.center,
@@ -148,15 +174,15 @@ class UserDetail extends StatelessWidget {
           ),
         ),
 
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: (){
-          APIService.updateProfileUser(user.id.toString(), user.username, passwordController.text, fullNameController.text, emailController.text, phoneController.text);
-          _scaffoldKey.currentState.showSnackBar(snackBar);
-        },
-        icon: Icon(Icons.save),
-        label: Text("Update"),
-        backgroundColor: Colors.green,
-      )
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: (){
+            APIService.updateProfileUser(user.id.toString(), user.username, passwordController.text, fullNameController.text, emailController.text, phoneController.text);
+            _scaffoldKey.currentState.showSnackBar(snackBar);
+          },
+          icon: Icon(Icons.save),
+          label: Text("Save"),
+          backgroundColor: Colors.green,
+        )
     );
   }
 
