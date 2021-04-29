@@ -1,12 +1,13 @@
+import 'package:commons/commons.dart';
 import 'package:flutter/material.dart';
-import 'package:login_sigup_flutter/Helper/api.services.dart';
+import 'package:login_sigup_flutter/Helper/UserService.dart';
 import 'package:login_sigup_flutter/Model/user.dart';
 
-class UpdateProfile extends StatelessWidget {
-
+class UserDetail extends StatelessWidget {
   final User user;
 
-  UpdateProfile({@required this.user});
+  UserDetail({@required this.user});
+
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final userNameController = TextEditingController();
@@ -14,6 +15,38 @@ class UpdateProfile extends StatelessWidget {
   final emailController = TextEditingController();
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
+
+
+  Widget buildAvatar(){
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(10),
+      child: Center(
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(image: NetworkImage(user.avatar),
+                  fit: BoxFit.fill,
+                ),
+              ),
+            ),
+            Positioned(
+                top: 50.0,
+                right: 50.0,
+                child: InkWell(
+                  onTap: (){},
+                  child: Icon(Icons.camera_alt, color: Colors.black26, size: 30,),
+                ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
   Widget _buildFullName(){
     return ListTile(
@@ -34,7 +67,7 @@ class UpdateProfile extends StatelessWidget {
         },
         decoration: InputDecoration(
             enabledBorder: InputBorder.none,
-         //   hintText: user.fullName,
+            hintText: user.fullName,
             icon: Icon(Icons.drive_file_rename_outline)
         ),
       ),
@@ -60,7 +93,7 @@ class UpdateProfile extends StatelessWidget {
         },
         decoration: InputDecoration(
             enabledBorder: InputBorder.none,
-          //  hintText: user.email,
+            hintText: user.email,
             icon: Icon(Icons.email)
         ),
       ),
@@ -85,7 +118,7 @@ class UpdateProfile extends StatelessWidget {
           return null;
         },
         decoration: InputDecoration(
-           // hintText: user.phoneNumber,
+            hintText: user.phoneNumber,
             enabledBorder: InputBorder.none,
             icon: Icon(Icons.phone)
         ),
@@ -113,28 +146,27 @@ class UpdateProfile extends StatelessWidget {
         decoration: InputDecoration(
           icon: Icon(Icons.lock_clock),
           enabledBorder: InputBorder.none,
-          //hintText: user.password,
+          hintText: user.password,
         ),
       ),
     );
   }
-  Widget buildAvatar(){
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(10),
-      color: Colors.redAccent[200],
-      child: Center(
+  Widget _buildListBody(){
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           children: <Widget>[
-            Container(
-              width: 100,
-              height: 100,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                image: DecorationImage(
-                  image: NetworkImage("https://i.pinimg.com/originals/3d/1a/da/3d1ada2607633fd746c7f03f2c7a7bab.jpg"),
-                  fit: BoxFit.fill,
-                ),
+            buildAvatar(),
+            Card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  _buildFullName(),
+                  _buildEmail(),
+                  _buildPhoneNumber(),
+                  _buildPassword(),
+                ],
               ),
             ),
           ],
@@ -143,53 +175,25 @@ class UpdateProfile extends StatelessWidget {
     );
   }
 
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        key: _scaffoldKey,
+      key: _scaffoldKey,
         appBar: AppBar(
-          title: Text("My Profile"),
-          centerTitle: true,
-          backgroundColor: Colors.redAccent[200],
+          title: Text("Welcome " + user.username),
+          backgroundColor: Colors.redAccent,
         ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: <Widget>[
-                buildAvatar(),
-                Card(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      _buildFullName(),
-                      _buildEmail(),
-                      _buildPhoneNumber(),
-                      _buildPassword(),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        floatingActionButton: FloatingActionButton.extended(
-          onPressed: (){
-            APIService.updateProfileUser(user.id.toString(), user.username, passwordController.text, fullNameController.text, emailController.text, phoneController.text);
-            _scaffoldKey.currentState.showSnackBar(snackBar);
-          },
-          icon: Icon(Icons.save),
-          label: Text("Save"),
-          backgroundColor: Colors.green,
-        )
+        body: _buildListBody(),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: (){
+          APIService.updateProfileUser(user.id.toString(), user.username, passwordController.text, fullNameController.text, emailController.text, phoneController.text);
+          successDialog(context, "Update Succeeded.");
+        },
+        icon: Icon(Icons.save),
+        label: Text("Update"),
+        backgroundColor: Colors.green,
+      )
     );
   }
-
-  final snackBar = SnackBar(content: Text("Update Successed.", style: TextStyle(
-    fontSize: 16,),),
-    duration: Duration(seconds: 2),
-    backgroundColor: Colors.green,
-  );
-
 }

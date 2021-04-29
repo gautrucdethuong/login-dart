@@ -1,12 +1,14 @@
+import 'package:commons/commons.dart';
 import 'package:flutter/material.dart';
-import 'package:login_sigup_flutter/Helper/api.services.dart';
+import 'package:login_sigup_flutter/Helper/UserService.dart';
 import 'package:login_sigup_flutter/Model/user.dart';
 
-class UserDetail extends StatelessWidget {
+class UpdateProfile extends StatelessWidget {
 
   final User user;
 
-  UserDetail({@required this.user});
+  UpdateProfile({@required this.user});
+
 
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
   final userNameController = TextEditingController();
@@ -15,7 +17,8 @@ class UserDetail extends StatelessWidget {
   final phoneController = TextEditingController();
   final passwordController = TextEditingController();
 
-  Widget _buildFullName(){
+
+  Widget buildFullName(){
     return ListTile(
       title: Text("Full Name", style: TextStyle(
         color: Colors.red, fontSize: 16,
@@ -40,7 +43,9 @@ class UserDetail extends StatelessWidget {
       ),
     );
   }
-  Widget _buildEmail(){
+
+
+  Widget buildEmail(){
     return ListTile(
       title: Text("Email Address", style: TextStyle(
         color: Colors.red, fontSize: 16,
@@ -66,7 +71,9 @@ class UserDetail extends StatelessWidget {
       ),
     );
   }
-  Widget _buildPhoneNumber(){
+
+
+  Widget buildPhoneNumber(){
     return ListTile(
       title: Text("Phone Number",style: TextStyle(
         color: Colors.red,fontSize: 16,
@@ -92,7 +99,8 @@ class UserDetail extends StatelessWidget {
       ),
     );
   }
-  Widget _buildPassword(){
+
+  Widget buildPassword(){
     return ListTile(
       title: Text("Password", style: TextStyle(
         color: Colors.red, fontSize: 16,
@@ -119,51 +127,80 @@ class UserDetail extends StatelessWidget {
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-        appBar: AppBar(
-          title: Text("Welcome " + user.username),
-          backgroundColor: Colors.redAccent,
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(12.0),
-            child: Column(
-              children: <Widget>[
-                Card(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: <Widget>[
-                      _buildFullName(),
-                      _buildEmail(),
-                      _buildPhoneNumber(),
-                      _buildPassword(),
-                    ],
-                  ),
+  Widget buildAvatar(){
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(10),
+      child: Center(
+        child: Column(
+          children: <Widget>[
+            Container(
+              width: 150,
+              height: 150,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                image: DecorationImage(image: NetworkImage(user.avatar),
+                  fit: BoxFit.fill,
                 ),
-              ],
+              ),
             ),
-          ),
+            Positioned(
+              top: 50.0,
+              right: 50.0,
+              child: InkWell(
+                onTap: (){},
+                child: Icon(Icons.camera_alt, color: Colors.black26, size: 30,),
+              ),
+            ),
+          ],
         ),
-
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: (){
-          APIService.updateProfileUser(user.id.toString(), user.username, passwordController.text, fullNameController.text, emailController.text, phoneController.text);
-          _scaffoldKey.currentState.showSnackBar(snackBar);
-        },
-        icon: Icon(Icons.save),
-        label: Text("Update"),
-        backgroundColor: Colors.green,
-      )
+      ),
     );
   }
 
-  final snackBar = SnackBar(content: Text("Update Successed.", style: TextStyle(
-    fontSize: 16,),),
-    duration: Duration(seconds: 2),
-    backgroundColor: Colors.green,
-  );
+  Widget buildListBody(){
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: <Widget>[
+            buildAvatar(),
+            Card(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  buildFullName(),
+                  buildEmail(),
+                  buildPhoneNumber(),
+                  buildPassword(),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        key: _scaffoldKey,
+        appBar: AppBar(
+          title: Text("My Profile"),
+          centerTitle: true,
+          backgroundColor: Colors.redAccent[50],
+        ),
+        body: buildListBody(),
+        floatingActionButton: FloatingActionButton.extended(
+          onPressed: (){
+            APIService.updateProfileUser(user.id.toString(), user.username, passwordController.text, fullNameController.text, emailController.text, phoneController.text);
+            successDialog(context, "Update Succeeded.");
+          },
+          icon: Icon(Icons.save),
+          label: Text("Save"),
+          backgroundColor: Colors.green,
+        )
+    );
+  }
 }

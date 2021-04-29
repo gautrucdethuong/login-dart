@@ -1,14 +1,11 @@
 import 'dart:convert';
 import 'dart:convert' as convert;
+import 'package:commons/commons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:login_sigup_flutter/GUI/filterPage.dart';
-import 'package:login_sigup_flutter/GUI/signup.dart';
-import 'package:login_sigup_flutter/Helper/api.services.dart';
-import 'package:login_sigup_flutter/Model/user.dart';
-import 'homepage.dart';
-import 'resetpasscreen.dart';
+import 'package:login_sigup_flutter/Helper/UserService.dart';
+import '../../HomePage/Product/home/home_screen.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -24,7 +21,13 @@ class _LoginScreenState extends State<LoginScreen>{
   final  usernameController = new TextEditingController();
   final  passwordController = new TextEditingController();
 
-  // widget
+  // widget build
+  Widget buildErrorConnection(){
+    return errorDialog(context, "No internet connection. Connect to the internet and try again.", negativeText: "Try Again", negativeAction: (){
+      waitDialog(context,duration: Duration(minutes: 3), message: "Please waiting...");
+    },neutralText: "Okay", neutralAction: (){
+    },icon: AlertDialogIcon.WIFI_OFF_ICON, title: "No network connection");
+  }
   Widget buildUsername(){
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -76,7 +79,6 @@ class _LoginScreenState extends State<LoginScreen>{
   }
   Widget buildPassword(){
     return Column(
-      // cung cấp các hằng số dùng để căng chỉnh
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         Text('Password', style: TextStyle(
@@ -123,24 +125,7 @@ class _LoginScreenState extends State<LoginScreen>{
       ],
     );
   }
-  Widget buildForgetPassBtn(){
-    return Container(
-      alignment: Alignment.centerRight,
-      child: FlatButton(
-        onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => ResetPassword()));
-        },
-        padding: EdgeInsets.only(right: 0),
-        child: Text(
-          'Forgot Password ?',
-          style: TextStyle(
-              color: Colors.white,
-              fontWeight: FontWeight.bold
-          ),
-        ),
-      ),
-    );
-  }
+
   Widget buildRememberCbb(){
     return Container(
       height: 20,
@@ -179,9 +164,9 @@ class _LoginScreenState extends State<LoginScreen>{
           onPressed: () async{
             setState(() {
               if(usernameController.text.trim().isNotEmpty && passwordController.text.trim().isNotEmpty){
-                Login(usernameController.text,passwordController.text);
+                loginPage(usernameController.text,passwordController.text);
               }else{
-                displayDialog(context, "Username and password required.", "","Cancel");
+                warningDialog(context, "Username and password required.",);
               }
             });
           },
@@ -200,28 +185,61 @@ class _LoginScreenState extends State<LoginScreen>{
         )
     );
   }
-  Widget buildSignupBtn(){
-    return GestureDetector(
-      child: RaisedButton(
-        child: Text('Sign Up',
-          style: TextStyle(
-            color: Colors.red,
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-          ),
+
+  Widget buildListBody(){
+    return AnnotatedRegion<SystemUiOverlayStyle>(
+      value: SystemUiOverlayStyle.light,
+      child: GestureDetector( // thu thap du lieu tren man hinh
+        child: Stack(
+          children:<Widget> [
+            Container(
+              height: double.infinity,
+              width: double.infinity,
+              // background khung man hinh
+              decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Color(0x6600BBEE),
+                        Color(0x9900BBEE),
+                        Color(0xcc00BBEE),
+                        Color(0xff00BBEE),
+                      ]
+                  )
+              ),
+              child: SingleChildScrollView(
+
+                physics: AlwaysScrollableScrollPhysics(),// tao thanh cuon
+                padding: EdgeInsets.symmetric(
+                    horizontal: 25,
+                    vertical: 120
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget> [
+                    Text('Welcome back!', style: TextStyle(
+                      color: Colors.red[600], fontSize: 40, fontWeight: FontWeight.bold,
+                    ),
+                    ),
+                    SizedBox(height: 50),
+                    buildUsername(),
+                    SizedBox(height: 20),
+                    buildPassword(),
+                    //buildRememberCbb(),
+                    buildLoginBtn(),
+                  ],
+                ),
+              ),
+            )
+          ],
         ),
-        onPressed: (){
-          Navigator.push(context,
-            MaterialPageRoute(builder: (context) => signup()), // chuyen new page
-          );
-        },
       ),
     );
   }
 
-    //login
-   Future<User> Login(String username, String password) async {
-
+  //method login
+   loginPage(String username, String password) async {
     setState(() {
       visible = true ;
     });
@@ -231,7 +249,7 @@ class _LoginScreenState extends State<LoginScreen>{
       'password': password,
     });
 
-    final response = await http.Client().post('http://10.0.2.2:5000/api/Token/login',
+    final response = await http.Client().post('http://10.0.2.2:5000/api/AuthenManager/login',
       headers: <String, String>{
         'Content-Type': 'application/json',
       },
@@ -242,12 +260,13 @@ class _LoginScreenState extends State<LoginScreen>{
     final parsed = repoData['result'];
 
     if(response.statusCode == 200){
-      // check status login
       if(parsed == "Successed."){
-        String token = repoData['data']['token'];
+        String token = repoData['data']['user_token'];
+        int user_id = repoData['data']['user_id'];
 
         APIService.setToken(token);
-        //APIService.read(parsed);
+        APIService.setIdUserLogin(user_id);
+
 
         setState(() {
           visible = false;
@@ -255,93 +274,29 @@ class _LoginScreenState extends State<LoginScreen>{
 
         Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomePage())
+            MaterialPageRoute(builder: (context) => HomeScreen())
         );
       }else{
 
         setState(() {
           visible = false;
         });
-            displayDialog(context, "No account was found matching that username and password.", "", "Try again");
+            warningDialog(context, "No account was found matching that username and password.", icon: AlertDialogIcon.WARNING_ICON);
       }
     }else{
-      throw Exception('Failed to load Data');
+      buildErrorConnection();
     }
   }
-
-
-    // show status message
-   displayDialog(BuildContext context, String title, String text, String confirm) {
-     showDialog(
-       context: context,
-       builder: (context) =>
-           CupertinoAlertDialog(
-             title: Text(title),
-             content: Text(text),
-             actions: <Widget>[
-               FlatButton(onPressed: (){
-                 Navigator.of(context).pop();
-               },
-                   child: CupertinoDialogAction(child: Text(confirm)))
-             ],
-           ),
-     );
-   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AnnotatedRegion<SystemUiOverlayStyle>(
-        value: SystemUiOverlayStyle.light,
-        child: GestureDetector( // thu thap du lieu tren man hinh
-          child: Stack(
-            children:<Widget> [
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                // background khung man hinh
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topCenter,
-                    end: Alignment.bottomCenter,
-                    colors: [
-                      Color(0x6600BBEE),
-                      Color(0x9900BBEE),
-                      Color(0xcc00BBEE),
-                      Color(0xff00BBEE),
-                    ]
-                  )
-                ),
-                child: SingleChildScrollView(
-
-                  physics: AlwaysScrollableScrollPhysics(),// tao thanh cuon
-                  padding: EdgeInsets.symmetric(
-                    horizontal: 25,
-                    vertical: 120
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget> [
-                      Text('User Login', style: TextStyle(
-                        color: Colors.pink, fontSize: 40, fontWeight: FontWeight.bold,
-                      ),
-                      ),
-                      SizedBox(height: 50),
-                      buildUsername(),
-                      SizedBox(height: 20),
-                      buildPassword(),
-                      //buildRememberCbb(),
-                      buildForgetPassBtn(),
-                      buildLoginBtn(),
-                      buildSignupBtn(),
-                    ],
-                  ),
-                ),
-              )
-            ],
-          ),
-        ),
+      appBar: AppBar(
+        backgroundColor: Colors.lightBlueAccent,
+        toolbarHeight: 40,
       ),
+      body: buildListBody(),
+
     );
   }
 }

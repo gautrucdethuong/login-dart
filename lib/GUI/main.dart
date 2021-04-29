@@ -1,12 +1,11 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:login_sigup_flutter/Animation/LoadingError.dart';
-import 'package:login_sigup_flutter/GUI/maindrawer.dart';
-import 'package:login_sigup_flutter/GUI/signup.dart';
-import 'package:login_sigup_flutter/GUI/updateprofile.dart';
-import 'homepage.dart';
-import 'loginscreeen.dart';
+import 'CartPage/page/cart_null_page.dart';
+import 'CartPage/page/credit_cart_page.dart';
+import 'CartPage/page/method_checkout_page.dart';
+import 'CartPage/page/wallet_page_checkout.dart';
+import 'HomePage/Product/constants.dart';
+import 'HomePage/Product/Welcomepage.dart';
 
 
 Future<void> main() {
@@ -23,18 +22,16 @@ class MyHttpOverrides extends HttpOverrides{
 }
 
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Flutter Demo',
-      //xóa nhãn debug trên màn hình ứng dụng,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        primarySwatch: Colors.red,
+        textTheme: Theme.of(context).textTheme.apply(bodyColor: kTextColor),
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: LoginScreen(),
+      home: WelcomePage(),
     );
   }
 }
